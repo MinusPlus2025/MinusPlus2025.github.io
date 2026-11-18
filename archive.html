@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>新物种档案馆 · THE SPECIES ARCHIVE</title>
+    <script type="module" crossorigin src="/assets/archive-CJmvHkUr.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/AholoAssetCatalog-DNDVoz9F.js">
+    <link rel="stylesheet" crossorigin href="/assets/archive-6nhPZnzX.css">
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <header id="brand">
+      <div class="brand-kicker">AHOLO LUX3D · A 3D SPECIES ARCHIVE</div>
+      <h1>新物种档案馆</h1>
+      <p>THE SPECIES ARCHIVE · 五材定序</p>
+    </header>
+
+    <div id="caption">
+      <div class="cap-kicker" id="cap-kicker">序 · BEFORE THE FIVE</div>
+      <div class="cap-title" id="cap-title">2026 年，第一种由文字生成的生物</div>
+      <div class="cap-sub" id="cap-sub">它之前不存在。Aholo Lux3D 用一段文字生成了它。</div>
+    </div>
+
+    <div id="progress">
+      <span id="chapter">00 / 06</span>
+      <div class="progress-track"><div id="progress-fill"></div></div>
+    </div>
+
+    <div id="scroll-hint">滚动前进 · SCROLL TO WALK</div>
+
+    <button id="btn-card" class="hidden">打开物种卡 ↗</button>
+
+    <div id="species-card" class="modal hidden">
+      <div class="modal-panel">
+        <div class="modal-head">
+          <div>
+            <div class="modal-kicker">SPECIES CARD · 3D AI NEW SPECIES</div>
+            <h2>六足玉铜孢兽 · NOVA-01</h2>
+          </div>
+          <button id="btn-close-card" class="modal-close">✕</button>
+        </div>
+        <div class="card-grid">
+          <div><span>生成任务</span><b>#8318494</b></div>
+          <div><span>生成时间</span><b>2026-11-18 21:13</b></div>
+          <div><span>身体基因</span><b>五材 · 灵木/玄铜/秘瓷/赤岩/星晶</b></div>
+          <div><span>档案编号</span><b>NOVA-01 / 0001</b></div>
+        </div>
+        <p class="card-note">同一只生物，被赋予五种材质身体；每种身体改变它的重力、浮力、导电、折光与热行为。它之前不存在——现在它在档案馆的尽头。</p>
+        <button id="btn-copy-card" class="card-share">复制档案链接</button>
+      </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+  </body>
+</html>
