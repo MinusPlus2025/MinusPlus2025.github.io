@@ -4,14 +4,36 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>天工万象：五材创世录 | AETHERFORGE — 2026 群核 Aholo 全球 3D AI 黑客松</title>
-    <script type="module" crossorigin src="/assets/index-CU8dMen3.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BydPCHzC.css">
+    <script type="module" crossorigin src="/assets/index-D_erFiJB.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CvYKJUai.css">
   </head>
   <body>
     <canvas id="game-canvas"></canvas>
+    <div class="world-grain" aria-hidden="true"></div>
 
     <!-- Floating Damage & Event Popups Layer -->
     <div id="popup-layer"></div>
+
+    <!-- Objective compass + first-run tutorial -->
+    <div id="objective-compass" class="objective-compass">
+      <div class="compass-bar">
+        <div class="compass-center"></div>
+        <div id="compass-needle" class="compass-needle">◆</div>
+      </div>
+      <div class="compass-readout">
+        <span class="compass-dot"></span>
+        <span id="objective-label">雷枢断桥</span>
+        <span id="objective-distance">0m</span>
+      </div>
+    </div>
+
+    <div id="tutorial-card" class="tutorial-card hidden">
+      <div class="tut-kicker">第一步 · 走进天工</div>
+      <div class="tut-row"><b>WASD</b><span>移动</span><b>Space</b><span>跳跃 / 滑翔</span></div>
+      <div class="tut-row"><b>F</b><span>造物</span><b>Q / 右键</b><span>抓取</span></div>
+      <div class="tut-row"><b>1–5</b><span>改写材质</span><b>E</b><span>进入秘境</span></div>
+      <button id="tut-close" class="tut-close">开始探索</button>
+    </div>
 
     <!-- Center Dynamic Reticle & Context Prompt -->
     <div id="reticle">
@@ -54,6 +76,7 @@
     <!-- Main In-Game HUD -->
     <header id="top-bar" class="hud-el hidden">
       <div class="quest-panel">
+        <div class="quest-kicker">下一步 · NEXT</div>
         <div class="island-tag" id="hud-island-code">ISLE 01 · 天工初醒岛</div>
         <div class="quest-title" id="hud-quest-text">
           按 [F] 开启天工神铸炉，或对准石桥按 [2] 重绘为【玄铜】导通双雷枢！
@@ -92,7 +115,7 @@
         <div id="boss-hp-fill" class="boss-hp-fill"></div>
       </div>
       <div class="boss-posture-wrap">
-        <span class="posture-label">五材架势护盾（用 [3]秘瓷折光 / [2]玄铜导雷 / [F]火炮 / 投掷重物 击破！）</span>
+        <span class="posture-label">五材架势护盾（用 [3]秘瓷折光 / [2]玄铜导雷 / [F]弩机 / 投掷重物 击破！）</span>
         <div class="posture-track"><div id="boss-posture-fill" class="posture-fill"></div></div>
       </div>
     </div>
@@ -153,7 +176,7 @@
         </div>
       </div>
 
-      <div class="controls-legend">
+      <div class="controls-legend" id="controls-legend">
         <div><kbd>WASD</kbd> 移动 <kbd>Shift</kbd> 疾跑/闪避</div>
         <div><kbd>Space</kbd> 二段跳 / 毕方滑翔翼</div>
         <div><kbd>左键</kbd> 如意棒连击 / 投掷造物</div>
@@ -161,6 +184,14 @@
         <div><kbd>G</kbd> 驾驭帆船/灵鲲 <kbd>F</kbd> 造物炉</div>
       </div>
     </footer>
+    <button id="btn-legend" class="btn-legend" title="显示/隐藏操作说明">?</button>
+
+    <!-- Island entry title card -->
+    <div id="island-title" class="island-title">
+      <div class="it-kicker" id="island-title-kicker">ISLE 01</div>
+      <div class="it-name" id="island-title-name">天工初醒岛 · 璇玑台</div>
+      <div class="it-lore" id="island-title-lore">五材初铸，雷枢断桥。</div>
+    </div>
 
     <!-- Modal 1: Aholo Lux3D Reality Forge ([F]) -->
     <div id="forge-modal" class="modal-backdrop hidden">
@@ -177,7 +208,7 @@
           <input
             id="forge-prompt-input"
             type="text"
-            placeholder="输入任意造物咒文，如：「造一艘能飞的星晶帆船」「召唤赤岩仙鼎融化冰封」「生成玄铜电磁炮」…"
+            placeholder="输入任意造物咒文，如：「造一艘能飞的星晶帆船」「召唤赤岩仙鼎融化冰封」「生成玄铜雷枢弩机」…"
           />
           <button id="btn-instant-prompt" class="btn-gold-sm">⚡ 语义瞬铸 (0.1s)</button>
           <button id="btn-cloud-create" class="btn-cyan-sm" title="使用已配置的 AHOLO_API_KEY 调用官方云端接口实时生成全新 GLB！">
@@ -231,6 +262,15 @@
         <div class="sg-card sg-aether"><b>星晶</b><span>零重力</span><em>悬空 · 天梯</em></div>
       </div>
       <div class="sg-foot">不是换皮肤：密度 / 摩擦 / 导电 / 折光 / 重力 全部改变玩法</div>
+    </div>
+
+    <!-- First-load screen: the title appears instantly; this covers the core asset load. -->
+    <div id="loading-screen" class="loading-screen hidden">
+      <div class="loading-seal"><span>天工</span></div>
+      <div class="loading-title">正在铸造天工群岛</div>
+      <div class="loading-step" id="loading-step">唤醒行者…</div>
+      <div class="loading-track"><div id="loading-fill" class="loading-fill"></div></div>
+      <div class="loading-lore">天工开物 · 五材定序</div>
     </div>
 
     <!-- Guided Review Demo Overlay -->
