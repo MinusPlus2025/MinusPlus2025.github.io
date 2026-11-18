@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>天工万象：五材创世录 | AETHERFORGE — 2026 群核 Aholo 全球 3D AI 黑客松</title>
+    <script type="module" crossorigin src="/assets/index-CU8dMen3.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BydPCHzC.css">
+  </head>
+  <body>
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Floating Damage & Event Popups Layer -->
+    <div id="popup-layer"></div>
+
+    <!-- Center Dynamic Reticle & Context Prompt -->
+    <div id="reticle">
+      <div class="reticle-ring"></div>
+      <div class="reticle-dot"></div>
+    </div>
+    <div id="context-hint" class="hidden"></div>
+
+    <!-- Cinematic AAA Title Overlay -->
+    <section id="title-screen">
+      <div class="title-vignette"></div>
+      <div class="title-content">
+        <div class="aholo-badge">
+          <span class="pulse-dot"></span>
+          <span>2026 群核 Aholo 全球 3D AI 黑客松 · 「3D AI 新物种奖」参赛作品</span>
+        </div>
+        <h1 class="game-logo">天工万象</h1>
+        <p class="game-subtitle">AETHERFORGE · A NEW SPECIES OF GENERATIVE ACTION-ADVENTURE</p>
+        <p class="game-pitch">
+          这不是一款用 AI 做美术的游戏。<br />
+          你说的每一件造物，都由 <strong>Aholo Lux3D</strong> 现场生成；同一形体，可被<strong>五种材质法则</strong>改写成五种物理物种——
+          灵木浮海、玄铜导雷、秘瓷折光、赤岩御风、星晶零重力。<strong>材质不是皮肤，是玩法基因。</strong>
+        </p>
+
+        <div class="feature-pills">
+          <span>✦ 24 件 Lux3D 资产 · 全部 taskId 可溯源</span>
+          <span>✦ 五材物理重绘 · 同形异种</span>
+          <span>✦ SpatialGen 3DGS · 3 座可潜入秘境</span>
+          <span>✦ 免登录 · 实机 60 FPS</span>
+        </div>
+
+        <div class="title-actions">
+          <button id="btn-guided-demo" class="btn-gold-primary">▶ 80 秒评审导览</button>
+          <button id="btn-start-game" class="btn-outline">自由探索 · 开启创世</button>
+        </div>
+        <div id="api-status-pill" class="api-pill">正在检测本地 Aholo OpenAPI 密钥状态…</div>
+      </div>
+    </section>
+
+    <!-- Main In-Game HUD -->
+    <header id="top-bar" class="hud-el hidden">
+      <div class="quest-panel">
+        <div class="island-tag" id="hud-island-code">ISLE 01 · 天工初醒岛</div>
+        <div class="quest-title" id="hud-quest-text">
+          按 [F] 开启天工神铸炉，或对准石桥按 [2] 重绘为【玄铜】导通双雷枢！
+        </div>
+        <div class="progress-chips">
+          <span id="chip-puzzles" class="chip">机关破译 0/3</span>
+          <span id="chip-rifts" class="chip">3DGS 星核 0/3</span>
+          <span id="chip-orbs" class="chip">仙桃灵韵 0/8</span>
+        </div>
+      </div>
+
+      <div class="quick-toolbar">
+        <button class="tool-btn" data-teleport="0" title="传送至 1号岛">壹·初醒岛</button>
+        <button class="tool-btn" data-teleport="1" title="传送至 2号岛">贰·观星渡</button>
+        <button class="tool-btn" data-teleport="2" title="传送至 3号浮岛">叁·扶桑巅</button>
+        <button class="tool-btn boss-jump" data-teleport="3" title="直达终焉首领战">肆·魔尊坛</button>
+        <button class="tool-btn accent" id="btn-open-forge">[F] 天工造物</button>
+        <button class="tool-btn" id="btn-cycle-weather">[T] 曦光破晓</button>
+        <button class="tool-btn" id="btn-open-inspector">[I] Aholo核验舱</button>
+        <button class="tool-btn" id="btn-photo-mode">[P] 摄影</button>
+        <button class="tool-btn" id="btn-mute-audio">🔊</button>
+      </div>
+    </header>
+
+    <!-- Live Cloud Aholo Task Queue Banner -->
+    <div id="cloud-task-banner" class="hidden"></div>
+
+    <!-- Colossus Boss Top-Center HUD -->
+    <div id="boss-hud" class="hidden">
+      <div class="boss-header">
+        <span class="boss-phase-tag" id="boss-phase-tag">PHASE I</span>
+        <span class="boss-name">蚀界魔尊 · 玄铁饕餮巨像</span>
+        <span class="boss-sub">Aholo Lux3D Auto-Rig + Motion Retarget Boss (#8258552)</span>
+      </div>
+      <div class="boss-bar-wrap">
+        <div id="boss-hp-fill" class="boss-hp-fill"></div>
+      </div>
+      <div class="boss-posture-wrap">
+        <span class="posture-label">五材架势护盾（用 [3]秘瓷折光 / [2]玄铜导雷 / [F]火炮 / 投掷重物 击破！）</span>
+        <div class="posture-track"><div id="boss-posture-fill" class="posture-fill"></div></div>
+      </div>
+    </div>
+
+    <!-- 3DGS Dimensional Rift HUD Overlay -->
+    <div id="rift-hud" class="hidden">
+      <div class="rift-card">
+        <div class="rift-badge">AHOLO SPATIALGEN · 3D GAUSSIAN SPLATTING (.SPZ)</div>
+        <h3 id="rift-title">裂隙壹 · 幽光浮生绿洲</h3>
+        <p id="rift-sub">漫步收集 3 枚空间本源星核（已收集 <span id="rift-score">0/3</span>）</p>
+        <button id="btn-exit-rift" class="btn-outline">[X] 脱离高斯裂隙返回群岛</button>
+      </div>
+    </div>
+
+    <!-- Bottom HUD: Hero Status + Five-Matter Lux3D Alchemy Bar + Key Guide -->
+    <footer id="bottom-hud" class="hud-el hidden">
+      <div class="vital-bars">
+        <div class="vital-row">
+          <span class="vital-lbl">气血</span>
+          <div class="vital-track"><div id="hero-hp-fill" class="vital-fill hp"></div></div>
+          <span id="hero-hp-num" class="vital-num">100</span>
+        </div>
+        <div class="vital-row">
+          <span class="vital-lbl">灵力</span>
+          <div class="vital-track"><div id="hero-stam-fill" class="vital-fill stam"></div></div>
+          <span id="fps-readout" class="vital-num">60 FPS</span>
+        </div>
+      </div>
+
+      <div class="matter-dock">
+        <div class="dock-caption">Aholo Lux3D 材质重绘法则（对准任意 3D 造物按 1–5 实时改写物理属性）</div>
+        <div class="matter-slots">
+          <button class="matter-slot active" data-matter="wood">
+            <span class="m-key">1</span>
+            <span class="m-name">灵木</span>
+            <span class="m-tag">入海浮筏</span>
+          </button>
+          <button class="matter-slot" data-matter="bronze">
+            <span class="m-key">2</span>
+            <span class="m-name">玄铜</span>
+            <span class="m-tag">千钧导雷</span>
+          </button>
+          <button class="matter-slot" data-matter="porcelain">
+            <span class="m-key">3</span>
+            <span class="m-name">秘瓷</span>
+            <span class="m-tag">镜面折光</span>
+          </button>
+          <button class="matter-slot" data-matter="molten">
+            <span class="m-key">4</span>
+            <span class="m-name">赤岩</span>
+            <span class="m-tag">融冰风涌</span>
+          </button>
+          <button class="matter-slot" data-matter="aether">
+            <span class="m-key">5</span>
+            <span class="m-name">星晶</span>
+            <span class="m-tag">零重悬空</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="controls-legend">
+        <div><kbd>WASD</kbd> 移动 <kbd>Shift</kbd> 疾跑/闪避</div>
+        <div><kbd>Space</kbd> 二段跳 / 毕方滑翔翼</div>
+        <div><kbd>左键</kbd> 如意棒连击 / 投掷造物</div>
+        <div><kbd>Q / 右键</kbd> 神念抓取 <kbd>R</kbd> 旋转</div>
+        <div><kbd>G</kbd> 驾驭帆船/灵鲲 <kbd>F</kbd> 造物炉</div>
+      </div>
+    </footer>
+
+    <!-- Modal 1: Aholo Lux3D Reality Forge ([F]) -->
+    <div id="forge-modal" class="modal-backdrop hidden">
+      <div class="modal-panel forge-panel">
+        <div class="modal-head">
+          <div>
+            <span class="modal-eyebrow">AHOLO LUX3D REALITY FORGE · 言出法随造物台</span>
+            <h2>天工神铸炉</h2>
+          </div>
+          <button id="btn-close-forge" class="btn-close">✕</button>
+        </div>
+
+        <div class="prompt-composer">
+          <input
+            id="forge-prompt-input"
+            type="text"
+            placeholder="输入任意造物咒文，如：「造一艘能飞的星晶帆船」「召唤赤岩仙鼎融化冰封」「生成玄铜电磁炮」…"
+          />
+          <button id="btn-instant-prompt" class="btn-gold-sm">⚡ 语义瞬铸 (0.1s)</button>
+          <button id="btn-cloud-create" class="btn-cyan-sm" title="使用已配置的 AHOLO_API_KEY 调用官方云端接口实时生成全新 GLB！">
+            🔥 Lux3D 云端真机生成
+          </button>
+        </div>
+        <div id="forge-feedback" class="forge-feedback">
+          提示：语义瞬铸可零延迟召唤 11 类精修 Lux3D 物理资产；点击「云端真机生成」将真实调用 <code>POST /lux3d/v1/generate/text-to-3d/task/create</code> 并在后台完成后空投至面前！
+        </div>
+
+        <div id="blueprint-grid" class="blueprint-grid"></div>
+      </div>
+    </div>
+
+    <!-- Modal 2: Aholo Tech Stack & Asset Telemetry Inspector ([I]) -->
+    <div id="inspector-modal" class="modal-backdrop hidden">
+      <div class="modal-panel inspector-panel">
+        <div class="modal-head">
+          <div>
+            <span class="modal-eyebrow">MANYCORE AHOLO HACKATHON · EVIDENCE & TELEMETRY</span>
+            <h2>群核 Aholo 技术栈实时核验舱</h2>
+          </div>
+          <button id="btn-close-inspector" class="btn-close">✕</button>
+        </div>
+        <div id="inspector-body" class="inspector-body"></div>
+      </div>
+    </div>
+
+    <!-- Victory Banner Modal -->
+    <div id="victory-modal" class="modal-backdrop hidden">
+      <div class="modal-panel victory-panel">
+        <span class="modal-eyebrow">WORLD RESTORED · 天工开物 万象重明</span>
+        <h2>✦ 蚀界魔尊已伏诛 · 四岛星枢共鸣 ✦</h2>
+        <p id="victory-stats"></p>
+        <div class="victory-actions">
+          <button id="btn-continue-sandbox" class="btn-gold-primary">继续自由探索与造物沙盒</button>
+          <button id="btn-victory-photo" class="btn-outline">进入电影摄影模式截图留念</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Five-Matter Species Taxonomy (shown in guided demo) -->
+    <div id="species-grid" class="species-grid hidden">
+      <div class="sg-kicker">ONE MESH · FIVE PHYSICAL SPECIES</div>
+      <div class="sg-title">同一形体，五种物种</div>
+      <div class="sg-cards">
+        <div class="sg-card sg-wood"><b>灵木</b><span>密度 0.38</span><em>浮水 · 化筏</em></div>
+        <div class="sg-card sg-bronze"><b>玄铜</b><span>金属度 0.92</span><em>导雷 · 破盾</em></div>
+        <div class="sg-card sg-porcelain"><b>秘瓷</b><span>粗糙度 0.05</span><em>折光 · 点星</em></div>
+        <div class="sg-card sg-molten"><b>赤岩</b><span>热上升流</span><em>融冰 · 御风</em></div>
+        <div class="sg-card sg-aether"><b>星晶</b><span>零重力</span><em>悬空 · 天梯</em></div>
+      </div>
+      <div class="sg-foot">不是换皮肤：密度 / 摩擦 / 导电 / 折光 / 重力 全部改变玩法</div>
+    </div>
+
+    <!-- Guided Review Demo Overlay -->
+    <div id="demo-overlay" class="demo-overlay hidden">
+      <div class="demo-bar demo-bar-top"></div>
+      <div class="demo-bar demo-bar-bottom"></div>
+      <div class="demo-caption">
+        <div class="demo-kicker" id="demo-kicker">AETHERFORGE / REVIEW MODE</div>
+        <div class="demo-title" id="demo-title"></div>
+        <div class="demo-sub" id="demo-sub"></div>
+      </div>
+      <div class="demo-progress"><div id="demo-progress-fill"></div></div>
+      <button id="demo-skip" class="demo-skip">跳过导览 ✕</button>
+      <div class="demo-tick" aria-hidden="true"></div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
+
+  </body>
+</html>
