@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>天工万象：五材创世录 | AETHERFORGE — 2026 群核 Aholo 全球 3D AI 黑客松</title>
-    <script type="module" crossorigin src="/assets/index-DAtIuju2.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-CvYKJUai.css">
+    <script type="module" crossorigin src="/assets/index-Dx7iwA0_.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CywVDlpc.css">
   </head>
   <body>
     <canvas id="game-canvas"></canvas>
@@ -32,6 +32,7 @@
       <div class="tut-row"><b>WASD</b><span>移动</span><b>Space</b><span>跳跃 / 滑翔</span></div>
       <div class="tut-row"><b>F</b><span>造物</span><b>Q / 右键</b><span>抓取</span></div>
       <div class="tut-row"><b>1–5</b><span>改写材质</span><b>E</b><span>进入秘境</span></div>
+      <div class="tut-note">每使用一种新材质，世界恢复一重颜色</div>
       <button id="tut-close" class="tut-close">开始探索</button>
     </div>
 
@@ -85,6 +86,17 @@
           <span id="chip-puzzles" class="chip">机关破译 0/3</span>
           <span id="chip-rifts" class="chip">3DGS 星核 0/3</span>
           <span id="chip-orbs" class="chip">仙桃灵韵 0/8</span>
+        </div>
+        <div class="law-row">
+          <span class="law-label">五材定序</span>
+          <span class="law-pips" id="law-pips">
+            <i class="law-pip law-wood" data-law="wood" title="灵木"></i>
+            <i class="law-pip law-bronze" data-law="bronze" title="玄铜"></i>
+            <i class="law-pip law-porcelain" data-law="porcelain" title="秘瓷"></i>
+            <i class="law-pip law-molten" data-law="molten" title="赤岩"></i>
+            <i class="law-pip law-aether" data-law="aether" title="星晶"></i>
+          </span>
+          <span class="law-count" id="law-count">0/5</span>
         </div>
       </div>
 
@@ -289,6 +301,7 @@
 
     <!-- Toast Notification -->
     <div id="toast" class="toast hidden"></div>
+    <div id="puzzle-flash" class="puzzle-flash" aria-hidden="true"></div>
 
   </body>
 </html>
